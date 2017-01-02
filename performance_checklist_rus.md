@@ -195,109 +195,73 @@
     10. Используйте технику «Сбора вершков»
 </h3>
 <p>
+    Что бы развернуть главную часть интерфейса в устаревших браузерах и
+    добавить продвинутый функционал для современных браузеров - используйте
+    технику <a href="http://responsivenews.co.uk/post/18948466399/cutting-the-mustard" target="_blank">«Сбора вершков»</a>. Распределите
+    процесс на стадии четко: Выгрузите главную часть моментально,
+    улучшения – по событию <code>DomContentLoaded</code> и прочие дополнения по событию <code>load</code>.
+    Обратите внимание что данная техника уменьшает зависимость
+    производительности браузера от устройства, и это что в наше
+    время все еще имеет смысл. Например, в развивающихся странах,
+    дешевые смартфоны на Android в большинстве своем используют
+    Chrome и смогут «собрать вершки» несмотря на их ограниченные память
+    и возможности процессора. Знайте, что, поскольку у нас с
+    Вами нет альтернативы данной техники использование этой техники
+    в последнее время стало более ограниченным.
 
 </p>
-
-
-
-
+<h3>
+    11. Обратите внимание на микро-оптимизацию и прогрессивную загрузку.
+</h3>
 <p>
-    <strong>
-        Неотредактированное
-    </strong>
-    Use the (cutting-the-mustard technique) to send the core experience to legacy browsers and an enhanced experience to modern browsers. Be strict in loading your assets: Load the core experience immediately, the enhancements on DomContentLoaded and the extras on the loadevent.
-    Note that the technique deduces device capability from browser version, which is no longer something we can do these days. For example, cheap Android phones in developing countries mostly run Chrome and will cut the mustard despite their limited memory and CPU capabilities. Beware that, while we don’t really have an alternative, use of the technique has become more limited recently.
+    В некоторых приложениях может понадобится какое-то время прежде чем
+    вы сможет отрендерить страницу. Гораздо лучшим решением будет
+    показывать
+    <a href="https://twitter.com/lukew/status/665288063195594752" target="_blank">скелет приложения</a>
+    вместо индикаторов     загрузки. Присмотритесь поближе к модулям
+    и техникам по уменьшению
+    скорости изначальной отрисовки страницы (Например, <a href="https://medium.com/@richavyas/aha-moments-from-ngconf-2016-part-1-angular-2-0-compile-cycle-6f462f68632e#.8b9afnsub" target="_blank">tree-shaking</a> и
+    <a href="https://webpack.github.io/docs/code-splitting.html" target="_blank">разделение кода</a>), потому что большинство времени тратится именно
+    на этом этапе на парсинг информации для приложения.
+    Также используйте <a href="https://www.lucidchart.com/techblog/2016/09/26/improving-angular-2-load-times/">преждевременный компилятор</a>
+    чтобы <a href="https://www.smashingmagazine.com/2016/03/server-side-rendering-react-node-express/" target="_blank">выполнить как можно весомую </a>часть рендера на
+    <a href="http://redux.js.org/docs/recipes/ServerRendering.html">сервере</a>
+     и     следовательно выведите используемые данные быстро.
+    В конце концов возьмите на вооружение <a href="https://github.com/nolanlawson/optimize-js" target="_blank">Optimize.js </a>для
+    ускоренной по средствам обертывания часто-используемых функций
+    загрузки (<a href="https://twitter.com/tverwaes/status/809788255243739136" target="_blank">это может быть и не нужно</a>).
+</p>
+<p>
+    <img src="img/progressive_booting.png" alt="Progressive booting"><br>
+    <i><a href="https://aerotwist.com/blog/when-everything-is-important-nothing-is/" target="_blank">
+        Прогрессивная загрузка
+    </a>
+        подразумевает использование отрисовки страницы на сервере что бы получить первую значимую картинку максимально быстро, а также подключите минимальный JavaScript, чтобы привести время интерактивности ближе к времени отрисовки первой значимой картинки.
+    </i>
 
-    11. Consider micro-optimization and progressive booting.
-    In some apps, you might need some time to initialize the app before you can render the page. Display skeleton screens instead of loading indicators. Look for modules and techniques to speed up the initial rendering time (for example, tree-shaking and code-splitting), because most performance issues come from the initial parsing time to bootstrap the app. Also, use an ahead-of-time compiler to offload some of the client-side rendering to the server and, hence, output usable results quickly. Finally, consider using Optimize.js for faster initial loading by wrapping eagerly invoked functions (it might not be necessary any longer, though).
-
-    Прогрессивная загрузка (Progressive booting) подразумевает использование отрисовки страницы на сервере что бы получить первую значимую картинку максимально быстро, а также подключите минимальный JavaScript, чтобы привести время интерактивности ближе к времени отрисовки первой значимой картинки.
-    Client-side rendering or server-side rendering? In both scenarios, our goal should be to set up (progressive booting): Use server-side rendering to get a quick first meaningful paint, but also include some minimal JavaScript to keep the time-to-interactive close to the first meaningful paint. We can then, either on demand or as time allows, boot non-essential parts of the app. Unfortunately, as (Paul Lewis noticed), frameworks typically have no concept of priority that can be surfaced to developers, and hence progressive booting is difficult to implement with most libraries and frameworks. If you have the time and resources, use this strategy to ultimately boost performance.
-
-    12. Are HTTP cache headers set properly?
-    Обязательно перепроверьте что expires, cache-control, max-age и другие заголовки кэша HTTP правильно выставлены. В общем, ресурсы должны подлегать кэшированию или на очень короткий срок (если они могут изменяться) или навсегда (если они неизменны) — вы можете просто изменять их версию в URL при необходимости.
-    По возможности, используйте Cache-control: immutable, предназначенный для защищенных отпечатком пальца статических ресурсов, во избежание ре-валидации (на момент написания – Декабрь 2016 - поддерживается только в Firefox (supported only in Firefox) по транзакциям https:// ). Вы можете использовать праймер заголовков HTTP кэша Хироку (Heroku’s primer on HTTP caching headers), «Лучшие практики по кешированию» Джейка Арчибальда (“Caching Best Practices”) и Праймер кэширования HTTP от Ильи Григорика (HTTP caching primer) в качестве руководства.
-
-    13. Ограничьте сторонние библиотеки и загружайте JavaScript асинхронно.
-    Когда пользователь запрашивает страницу, браузер извлекает HTML и строит DOM, потом собирает CSS и строит CSSOM, и только потом генерирует дерево рендера, в соответствии с DOM и CSSOM. Если какой-либо скрипт должен отработать, по умолчанию, браузер не начинает рендер страницы пока скрипт не закончит работу, что вызывает задержки рендера. Нам, разработчикам, приходится настойчиво указывать браузеру что не стоит ждать окончания выполнения скриптов для начала рендера страницы. Простейшим способом добиться этого являются HTML атрибуты defer и async.
-    На практике, хорошо бы нам отдавать предпочтение (prefer ) defer (to) перед  async (как поблажку для пользователей IE9 и старше (cost to users of Internet Explorer), потому что скорее всего иначе Вы сломаете им все скрипты). Также постарайтесь ограничить влияние сторонних скриптов и библиотек, особенно кнопок социальных сетей и врезок   (карт, например). Вместо этого вы можете использовать статические кнопки социальных сетей (static social sharing buttons) (например, SSBG) и статические ссылки на интерактивные карты (static links to interactive maps).
-
-    14. Правильно ли оптимизированы изображения?
-    Как можно больше используйте адаптивные изображения (responsive images) с атрибутами srcset, sizes и элементом . While you’re at it, you could also make use of the WebP format by serving WebP images with the element and a JPEG fallback (see Andreas Bovens’ code snippet) or by using content negotiation (используя заголовки Accept). Sketch нативно поддерживает WebP, и изображения в формате WebP могут быть экспортированы из Photoshop используя плагин WebP для Photoshop (WebP plugin for Photoshop).  Конечно, возможны и другие варианты. (Other options are available).
-
-        Генератор брейкпоинтов для адаптивных изображений ( Responsive Image Breakpoints Generator) автоматизирует создание изображений и разметки.
-        Вы также могли бы использовать клиентские подсказки, (client hints), они как раз сейчас заручаются поддержкой браузеров (gaining browser support). Не успеваете заняться сложной разметкой для адаптивности Ваших изображений? Вам в помощь Генератор брейкпоинтов для адаптивных изображений ( Responsive Image Breakpoints Generator) а также другие сервисы автоматизированной оптимизации изображений, например Cloudinary. Также, в большинстве случаев, использование одних только srcset и sizes принесет значительную выгоду.  Например, ребята из Smashing Magazine, используют -opt для имён изображений — например, brotli-compression-opt.png; Как только изображение содержит в себе постфикс opt, каждый член команды знает, что его уже не нужно оптимизировать.
-        15. Выведите оптимизацию изображений на новый уровень.
-        Когда Вы работаете над лэндингом, для которого критичным является молниеносная загрузка некоторых изображений убедитесь что Ваши  JPEGи прогрессивны и сжаты с помощью  mozJPEG (который улучшает скорость начала рендера изображения с помощью манипуляций с уровнями сканирования), Pingo для PNG, Lossy GIF для GIF и SVGOMG для SVG. Размойте ненужные части изображения (применяя к ним размытие по Гауссу) что бы уменьшить размер изображения, если даже это не помогает, в конце концов можете попробовать лишать изображение цвета, черно-белое изображение весит гораздо меньше. Для фоновых изображений вполне приемлемым будет экспорт изображений с качеством от 0 до 10%.
-        Все еще не довольны результатом? Ну тогда, Вам придется обратиться к технике множественных фоновых изображений (multiple background images technique).
-
-        16. Как обстоят дела с оптимизацией веб шрифтов?
-        Chances are high that the web fonts you are serving include glyphs and extra features that aren’t being used. You can ask your type foundry to subset web fonts or subset them yourself if you are using open-source fonts (for example, by including only Latin with some special accent glyphs) to minimize their file sizes. WOFF2 support is great, and you can use WOFF and OTF as fallbacks for browsers that don’t support it. Also, choose one of the strategies from Zach Leatherman’s “Comprehensive Guide to Font-Loading Strategies,” and use a service worker cache to cache fonts persistently. Need a quick win? Pixel Ambacht has a quick tutorial and case study to get your fonts in order.
-
-
-        Zach Leatherman’s Comprehensive Guide to Font-Loading Strategies provides a dozen of options for better web font delivery.
-        If you can’t serve fonts from your server and are relying on third-party hosts, make sure to use Web Font Loader. FOUT is better than FOIT; start rendering text in the fallback right away, and load fonts asynchronously — you could also use loadCSS for that. You might be able to get away with locally installed OS fonts as well.
-        17. Молниеносно выгрузите критичные CSS стили.
-        To ensure that browsers start rendering your page as quickly as possible, it’s become a common practice to collect all of the CSS required to start rendering the first visible portion of the page (known as “critical CSS” or “above-the-fold CSS”) and add it inline in the <head> of the page, thus reducing roundtrips. Due to the limited size of packages exchanged during the slow start phase, your budget for critical CSS is around 14 KB. If you go beyond that, the browser will need addition roundtrips to fetch more styles. CriticalCSS and Criticalenable you to do just that. You might need to do it for every template you’re using. If possible, consider using the conditional inlining approach used by the Filament Group.
-            With HTTP/2, critical CSS could be stored in a separate CSS file and delivered via a server push without bloating the HTML. The catch is that server pushing isn’t supported consistently and has some caching issues (see slide 114 onwards of Hooman Beheshti’s presentation). The effect could, in fact, be negative and bloat the network buffers, preventing genuine frames in the document from being delivered. Server pushing is much more effective on warm connections due to the TCP slow start. So, you might need to create a cache-aware HTTP/2 server push mechanism. Keep in mind, though, that the new cache-digest specification will negate the need to manually build these “cache-aware” servers.
-
-            18. Используйте tree-shaking и code-splitting для уменьшения нагрузки.
-            (Tree-shaking) is a way to clean up your build process by only including code that is actually used in production. You can (use Webpack 2 to eliminate unused exports), and UnCSS or Helium to remove unused styles from CSS. Also, you might want to consider learning how to (write efficient CSS selectors) as well as how to (avoid bloat and expensive styles).
-            (Code-splitting) is another Webpack feature that splits your code base into “chunks” that are loaded on demand. Once you define split points in your code, Webpack takes care of the dependencies and outputted files. It basically enables you to keep the initial download small and to request code on demand, when requested by the application.
-            Note that Rollup shows significantly better results than Browserify exports. While we’re at it, you might want to check out Rollupify, which converts ECMAScript 2015 modules into one big CommonJS module — because small modules can have a (surprisingly high performance cost) depending on your choice of bundler and module system.
-
-            19. Улучшайте производительность рендера.
-            Isolate expensive components with CSS containment — for example, to limit the scope of the browser’s styles, of layout and paint work for off-canvas navigation, or of third-party widgets. Make sure that there is no lag when scrolling the page or when an element is animated, and that you’re consistently hitting 60 frames per second. If that’s not possible, then at least making the frames per second consistent is preferable to a mixed range of 60 to 15. Use CSS’ will-change to inform the browser of which elements and properties will change.
-            Also, measure runtime rendering performance (for example, in DevTools). To get started, check Paul Lewis’ free Udacity course on browser-rendering optimization. We also have a lil’ article by Sergey Chikuyonok on how to get GPU animation right.
-
-            20. Warm up the connection to speed up delivery.
-            Use skeleton screens, and lazy-load all expensive components, such as fonts, JavaScript, carousels, videos and iframes. Use resource hints to save time on dns-prefetch (which performs a DNS lookup in the background), preconnect (which asks the browser to start the connection handshake (DNS, TCP, TLS) in the background), prefetch(which asks the browser to request a resource), prerender (which asks the browser to render the specified page in the background) and preload (which prefetches resources without executing them, among other things). Note that in practice, depending on browser support, you’ll prefer preconnect to dns-prefetch, and you’ll be cautious with using prefetch and prerender — the latter should only be used if you are very confident about where the user will go next (for example, in a purchasing funnel).
-
-            HTTP/2
-
-            21. Будьте готовы к HTTP/2.
-            With Google moving towards a more secure web and eventual treatment of all HTTP pages in Chrome as being “not secure,” you’ll need to decide on whether to keep betting on HTTP/1.1 or set up an HTTP/2 environment. HTTP/2 is supported very well; it isn’t going anywhere; and, in most cases, you’re better off with it. The investment will be quite significant, but you’ll need to move to HTTP/2 sooner or later. On top of that, you can get a major performance boost with service workers and server push (at least long term).
-
-            Eventually, Google plans to label all HTTP pages as non-secure, and change the HTTP security indicator to the red triangle that Chrome uses for broken HTTPS. (Image source)
-            The downsides are that you’ll have to migrate to HTTPS, and depending on how large your HTTP/1.1 user base is (that is, users on legacy operating systems or with legacy browsers), you’ll have to send different builds, which would require you to adapt a different build process. Beware: Setting up both migration and a new build process might be tricky and time-consuming. For the rest of this article, I’ll assume that you’re either switching to or have already switched to HTTP/2.
-
-            22. Properly deploy HTTP/2.
-            Again, serving assets over HTTP/2 requires a major overhaul of how you’ve been serving assets so far. You’ll need to find a fine balance between packaging modules and loading many small modules in parallel.
-            On the one hand, you might want to avoid concatenating assets altogether, instead breaking down your entire interface into many small modules, compressing them as a part of the build process, referencing them via the “scout” approach and loading them in parallel. A change in one file won’t require the entire style sheet or JavaScript to be re-downloaded.
-            On the other hand, packaging still matters because there are issues with sending many small JavaScript files to the browser. First, compression will suffer. The compression of a large package will benefit from dictionary reuse, whereas small separate packages will not. There’s standard work to address that, but it’s far out for now. Secondly, browsers have not yet been optimized for such workflows. For example, Chrome will trigger inter-process communications (IPCs) linear to the number of resources, so including hundreds of resources will have browser runtime costs.
-
-            Что бы достичь лучших результатов используя HTTP/2, попробуйте подгружать CSS прогрессивно (load CSS progressively), как было предложено Джеком Арчибальдом из Chrome.
-
-            Still, you can try to load CSS progressively. Obviously, by doing so, you are actively penalizing HTTP/1.1 users, so you might need to generate and serve different builds to different browsers as part of your deployment process, which is where things get slightly more complicated. You could get away with HTTP/2 connection coalescing, which allows you to use domain sharding while benefiting from HTTP/2, but achieving this in practice is difficult.
-            What to do? If you’re running over HTTP/2, sending around 10 packages seems like a decent compromise (and isn’t too bad for legacy browsers). Experiment and measure to find the right balance for your website.
-
-            23. Удостоверьтесь в пуленепробиваемой защите вашего сервера.
-            All browser implementations of HTTP/2 run over TLS, so you will probably want to avoid security warnings or some elements on your page not working. Double-check that your (security headers are set properly), (eliminate known vulnerabilities), and (check your certificate).
-            Haven’t migrated to HTTPS yet? Check (The HTTPS-Only Standard) for a thorough guide. Also, make sure that all external plugins and tracking scripts are loaded via HTTPS, that cross-site scripting isn’t possible and that both (HTTP Strict Transport Security headers) and (Content Security Policy headers) are properly set.
-
-            24. Поддерживают ли Ваш сервер и CDNы HTTP/2?
-            Разные сервера и CDNы скорее всего будет поддерживать HTTP/2 по-разному. Попробуйте Is TLS Fast Yet? Что-бы уточнить информацию касательно вашего варианта или в сравнении с другими узнать насколько производителен Ваш сервер и поддержку каких фич стоит ожидать в скором времени.
-
-            Ресурс Is TLS Fast Yet? Позволяет Вам проанализировать конфигурации серверов и CDN при переходе на HTTP/2.
-            25. Используется ли сжатие Brotli или Zopfli?
-            В прошлом году Google представили миру Brotli (introduced Brotli), новый формат данных без потерь, который уже широко поддерживается (widely supported) в Chrome, Firefox и Opera. На практике, Brotli представляется более эффективным (more effective) чем Gzip и Deflate. Сам процесс сжатия может быть затяжным, в зависимости от настроек и чем дольше длится сжатие, тем выше будет уровень самого сжатия. Кстати говоря, декомпрессия происходит быстро. Не будет сюрпризом что браузеры будут поддерживать этот алгоритм только если пользователь посещает вебсайт через HTTPS, ведь алгоритм разработан в Google, но на самом деле, на то есть еще и технические причины. Загвоздка в том, что Brotli не предустановлен на большинстве серверов сегодня, и не так уж просто его настроить без самостоятельной компиляции NGINX или Ubuntu. Однако, вы можете активировать Brotli даже на тех CDN, которые пока что его не поддерживают (enable Brotli even on CDNs that don’t support it) yet (с помощью сервис воркеров).
-            В качестве альтернативы, можете рассмотреть алгоритм сжатия Zopfli (Zopfli’s compression algorithm), который кодирует информацию в форматы Deflate, Gzip и Zlib. Любой ресурс сжатый простым Gzip-ом можно выгодно сжимать с Zopfli’s с улучшеным кодированием Deflate, потому что файлы будут на 3-8% меньше чем может предоставить лушчее сжатие от Zlib’s. Загвоздка в тому, что это займет гораздо больше времени (~в 80 раз дольше). Поэтому использование Zopfli будет отличным решением для ресурсов, которые не очень-то меняются, файлы, которые, были созданы, чтобы однажды быть сжатыми и множество раз скачанными.
-
-            26. Активировано ли OCSP сшивание?
-            By enabling OCSP stapling on your server, you can speed up your TLS handshakes. The Online Certificate Status Protocol (OCSP) was created as an alternative to the Certificate Revocation List (CRL) protocol. Both protocols are used to check whether an SSL certificate has been revoked. However, the OCSP protocol does not require the browser to spend time downloading and then searching a list for certificate information, hence reducing the time required for a handshake.
-
-            27. Успели ли Вы взять IPv6 на вооружение?
-            Because we’re running out of space with IPv4 and major mobile networks are adopting IPv6 rapidly (the US has reached a 50% IPv6 adoption threshold), it’s a good idea to update your DNS to IPv6 to stay bulletproof for the future. Just make sure that dual-stack support is provided across the network — it allows IPv6 and IPv4 to run simultaneously alongside each other. After all, IPv6 is not backwards-compatible. Also, studies show that IPv6 made those websites 10 to 15% faster due to neighbor discovery (NDP) and route optimization.
-
-            28. Пользуетесь ли Вы HPACK сжатием?
-            В случае если вы используете HTTP/2, стоит убедиться, что Ваши сервера используют сжатие HPACK (implement HPACK compression) в заголовках HTTP ответов, чтобы уменьшить использование ресурсов. Из-за того, что сервера HTTP/2 относительно молоды, может иметь место неполноценная поддержка спецификаций, с HPACK, например. H2spec это отличный (и очень детализированный) инструмент что бы проверить работоспособность HPACK (HPACK works).
-
-            H2spec
-            29. Работают ли сервис воркеры для кэширования и сетевых фолбэков?
-            Как ни оптимизируй сетевую передачу данных, она не будет быстрее чем получение данных из локального кэша, хранящегося на устройстве пользователя. Если Ваш вебсайт использует HTTPS, стоит присмотреться к «Прагматичному гиду по сервис воркерам» (“Pragmatist’s Guide to Service Workers”) что бы добавлять в кэш сервис воркеров статические материалы и локально хранить офлайн фолбэки (или целые офлайн страницы) и открывать их из памяти устройства пользователя а не отправляться за ними в. Будет полезным также посмотреть «Книгу рецептов для Офлайна» от Джейка (Offline Cookbook) и бесплатный Udacity курс “Offline Web Applications.” Волнуетесь о поддержке браузерами? Не стоит, она на подходе (getting there), да и сеть в любом случае останется запасным вариантом.
+</p>
+<p>
+    Рендер на клиенте или на сервере? В обоих случая нашей целью должно
+    быть добиться <a href="https://aerotwist.com/blog/when-everything-is-important-nothing-is/" target="_blank">прогрессивной загрузки</a>:
+    Используйте рендер на стороне сервера что бы получить первую значимую
+    картинку как можно быстрее, а так же добавьте немного JavaScript’а что бы
+    привести время интерактивности к времени первой значимой картинки.
+    А догрузить (или по запросу или когда позволит время) менее значимые
+    функции страницы мы всегда успеем. К сожалению, как заметил
+    <a href="https://aerotwist.com/blog/when-everything-is-important-nothing-is/#which-to-use-progressive-booting" target="_blank">Пол Льюис</a>, в
+    большинстве своем фреймворки не берут во внимание понятие приоритетности
+    которое можно было бы использовать разработчику, и поэтому прогрессивную
+    загрузку довольно сложно имплементировать с большинством библиотек и фреймворков.
+    Если Вам позволяет время и ресурсы используйте эту стратегию что бы достичь
+    идеальной загрузки.
 
 
 </p>
+<h3>
+    12. Правильно ли настроены HTTP заголовки?
+</h3>
+
+
 
 <h2>
     ТЕСТИРОВАНИЕ И МОНИТОРИНГ
