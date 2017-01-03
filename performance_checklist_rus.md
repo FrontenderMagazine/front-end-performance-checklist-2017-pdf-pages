@@ -22,7 +22,7 @@
     всех тем с которыми вам возможно придется столкнуться для обеспечения
     максимально быстрого отклика и плавности работы Вашего вебсайта.
     (Вы так же можете просто <a href="http://provide.smashingmagazine.com/performance-checklist/performance-checklist-1.0.pdf?_ga=1.67706521.905683373.1482741288"><strong>загрузить чеклист в PDF (ENG) (0.129 MB)</strong></a> ,
-    <a href="#"
+    <a href="https://github.com/FrontenderMagazine/front-end-performance-checklist-2017-pdf-pages/blob/master/Front-End%20Performance%20Checklist%202017.pdf"
        target="_blank"><strong>загрузить чеклист в PDF (RUS) (0.129 MB)</strong></a>
     или <a href="http://provide.smashingmagazine.com/performance-checklist/performance-checklist-1.0.pages?_ga=1.63331879.905683373.1482741288"><strong>скачать чеклист в формате Apple Pages (ENG) (0.236 MB)</strong></a>. Cчастливой оптимизации!)
 
@@ -828,7 +828,7 @@ SpeedCurve</a> чтобы отслеживать изменения в прои�
 <ul>
     <li><a href="http://provide.smashingmagazine.com/performance-checklist/performance-checklist-1.0.pdf" target="_blank">
         Download the checklist PDF </a></li>
-    <li><a href="#" target="_blank">
+    <li><a href="https://github.com/FrontenderMagazine/front-end-performance-checklist-2017-pdf-pages/blob/master/Front-End%20Performance%20Checklist%202017.pdf" target="_blank">
         Скачать чеклист в PDF на русском </a></li>
     <li><a href="http://provide.smashingmagazine.com/performance-checklist/performance-checklist-1.0.pages?_ga=1.131076231.905683373.1482741288" target="_blank">
     download the checklist in Apple Pages </a></li>
