@@ -1,6 +1,6 @@
 <h1>Чеклист производительности Front-End для 2017 </h1>
 <p>
-    Кто из Вас уже использует прогрессивную загрузку (progressive booting)
+    Кто из Вас уже использует прогрессивную загрузку
     в своих проектах? А как на счет <strong>tree-shaking</strong> и <strong>code-splitting</strong> в React и
     Angular? Успели ли Вы настроить под себя сжатие Brotli или Zopfli, сшивания
     OCSP (OCSP stapling) и сжатие HPACK (HPACK compression)? Не стоит так же забывать
@@ -368,18 +368,106 @@
     16. Как обстоят дела с оптимизацией веб шрифтов?
 </h3>
 <p>
-
+    Велик шанс, что в веб-шрифтах которые вы используете в
+    своем проекте присутствуют символы, которые вы не используете.
+    Вы могли бы попросить поставщика шрифтов сузить набор
+    символов для ваших нужд или <a href="https://www.fontsquirrel.com/tools/webfont-generator" target="_blank">заняться этим самостоятельно</a>,
+    Если Вы используете открытые шрифты (например, включая в алфавит только некоторые символы из латиницы) чтобы уменьшить размеры файла.
+    <br>
+    <a href="http://caniuse.com/#search=woff2" target="_blank">Поддержка WOFF2 </a> великолепна, а для
+    подстраховки Вы можете использоваться WOFF и OTF специально
+    для браузеров с отстающей поддержкой. Также выберите для себя
+    одну из стратегий Зака Лэзермана – <a href="https://www.zachleat.com/web/comprehensive-webfonts/" target="_blank">“Полное руководство
+    по стратегиям загрузки шрифтов,” </a> а также используйте кэш
+    сервис воркеров для постоянного кэширования шрифтов. Хотите
+    быстрых результатов? У Pixel Ambacht есть <a href="https://pixelambacht.nl/2016/font-awesome-fixed/" target="_blank"> краткое исследование</a>
+    вопроса (quick tutorial and case study), как привести Ваши
+    шрифты в порядок.
+</p>
+<p>
+    <img src="img/fonts.png" alt="Полное руководство по стратегиям загрузки шрифтов">
+    <br>
+    <i>
+        <a href="https://www.zachleat.com/web/comprehensive-webfonts/"> “Полное руководство по стратегиям загрузки шрифтов,”</a>
+        Зака Лэзермана предоставляет дюжену опций для улучшения выгрузки шрифтов/
+    </i>
+</p>
+<p>
+    Обязательно используйте <a href="https://github.com/typekit/webfontloader" target="_blank">Web Font Loader </a>если Вам приходится
+    использовать внешние сервера для загрузки шрифтов.
+    <a href="https://www.filamentgroup.com/lab/font-events.html" target="_blank">FOUT лучше чем FOIT</a>; сразу же начните отрисовку текста,
+    и загрузите шрифты асинхронно— можете использовать
+    <a href="https://github.com/filamentgroup/loadCSS" target="_blank"> loadCSS </a> для этих целей. Вы так же <a
+        href="https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/" target="_blank">обойтись и шрифтами
+    установленными локально в ОС</a>.
 </p>
 <h3>
     17. Молниеносно выгрузите критичные CSS стили.
 </h3>
 <p>
+    Что бы быть уверенным на все 100% что Ваш браузер начнет
+    рендер страницы настолько быстро, на сколько это возможно,
+    <a href="https://www.smashingmagazine.com/2015/08/understanding-critical-css/" target="_blank">общепринятой практикой   </a>становится собирать
+    весь CSS необходимый для начала рендера первой видимой части
+    страницы (известный как «критично-важный» CSS) и добавлять его
+    инлайново в <code> &lt head&gt </code> вашего документа таким образом уменьшая
+    запросы зависимости. Из-за ограничения на передачу пакетов во
+    время медленной фазы ~ 14 KB это принято считать Вашим бюджетом
+    критично важных CSS.  Если Вы выйдете за рамки бюджета, браузер
+    совершать дополнительные обращения чтобы выгрузить больше стилей.
+    <a href="https://github.com/filamentgroup/criticalCSS" target="_blank">CriticalCSS </a> и <a href="https://github.com/addyosmani/critical" target="_blank">Critical </a>
+    позволяют Вам управится с задачей. Вам
+    скорее всего понадобится проделать это с каждым шаблоном над
+    которым Вы работаете. Если возможно, постарайтесь использовать
+    <a href="https://www.filamentgroup.com/lab/performance-rwd.html" target="_blank">условно-инлайновый подход</a>
+    представленный Filament Group.
+    С появлением HTTP/2, критично-важный CSS можно хранить в
+    отдельном файле CSS и выгружать по запросу с сервера с
+    помощью сервер пуша не загрязняя HTML. Загвоздка в том,
+    что сервер пуш на данный момент не поддерживается и вызывает
+    некоторые проблемы с кэшированием (слайд 114 <a href="http://www.slideshare.net/Fastly/http2-what-no-one-is-telling-you" target="_blank">презентации Хумана
+    Бэхешти</a>). Результат может <a href="http://calendar.perfplanet.com/2016/http2-push-the-details/" target="_blank">быть негативным</a>, и привести
+    к загрязнению сетевых буферов, и предотвращению доставки
+    истинных пакетов. Сервер пуш гораздо более эффективен
+    на <a href="https://docs.google.com/document/d/1K0NykTXBbbbTlv60t5MyJvXjqKGsCVNYHyLEXIxYMv0/edit" target="_blank">«теплом» соединении</a>  из-за медленного старта TCP.
+    Так что Вам может понадобиться создать механизм <a href="https://css-tricks.com/cache-aware-server-push/" target="_blank"> HTTP/s
+    сервер пуша осведомленный о кэше</a>. Помните, что новая
+    <a href="http://calendar.perfplanet.com/2016/cache-digests-http2-server-push/" target="_blank">спецификация <code>cache-digest </code> </a>снизит потребность
+    в создании таких механизмов вручную.
 
 </p>
 <h3>
     18. Используйте tree-shaking и code-splitting для уменьшения нагрузки.
 </h3>
 <p>
+    <a href="https://medium.com/@roman01la/dead-code-elimination-and-tree-shaking-in-javascript-build-systems-fb8512c86edf" target="_blank">Tree-shaking</a>  это способ расчистить ваш процесс
+    сборки вовлекая только ту часть кода, которая
+    действительно используется на продакшене.
+    Вы можете пользоваться <a href="http://www.2ality.com/2015/12/webpack-tree-shaking.html" target="_blank">Webpack 2 что бы свести
+    к минимум ненужные экспорты кода</a>, (use Webpack
+    2 to eliminate unused exports), и <a href="https://github.com/giakki/uncss" target="_blank">UnCSS </a>
+    или <a href="https://github.com/geuis/helium-css" target="_blank">
+    Helium</a> что бы предотвратить добавление в билд
+    неиспользуемых стилей. Также Вы могли бы
+    научиться <a href="http://csswizardry.com/2011/09/writing-efficient-css-selectors/" target="_blank">писать эффективные CSS селекторы</a>
+    и избегать <a href="https://benfrain.com/css-performance-revisited-selectors-bloat-expensive-styles/" target="_blank">нагромождения весомых стилей</a>.
+    <a href="https://webpack.github.io/docs/code-splitting.html">Code-splitting </a>это еще одна фича Webpack’а,
+    которая разбивает основание кода на куски и
+    подгружает по запросу. Как только
+    Вы определите точки разделения вашего кода,
+    Webpack сможет позаботиться о зависимостях,
+    и выходных файлах. Он, по сути, позволяет
+    тебе держать изначальный трафик минимальным и
+    запрашивать код при необходимости самим приложением.
+    Примите к сведению что <a href="http://rollupjs.org/" target="_blank">Rollup</a> показывает гораздо
+    лучшие результаты чем выдает Browserify.
+    Раз уж мы заговорили от этом, вам может быть
+    также интересен <a href="https://github.com/nolanlawson/rollupify" target="_blank">Rollupify</a>, который превращает
+    модули ECMAScript 2015 в один большой CommonJS
+    модуль — потому что маленькие модули могут
+    требовать, <a href="https://nolanlawson.com/2016/08/15/the-cost-of-small-modules/" target="_blank">на удивление, больших затрат
+    производительности</a>, в зависимости от сборщика
+    и модульной системы, которой вы пользуетесь.
 
 </p>
 <h3>
@@ -398,6 +486,40 @@
     21. Будьте готовы к HTTP/2.
 </h3>
 <p>
+    Вместе с Google, <a href="https://security.googleblog.com/2016/09/moving-towards-more-secure-web.html" target="_blank">двигающимся в сторону
+    более безопасного веба</a> и окончательного восприятия
+    HTTP  страниц Chrome’ом как «небезопасные»
+    вам придется решиться сделать ставку, или на
+    конфигурацию окружения <a href="https://http2.github.io/faq/" target="_blank">HTTP/2  или остаться</a> на
+    HTTP/1.1.  HTTP/2 <a href="http://caniuse.com/#search=http2" target="_blank">отлично поддерживается</a>;
+    Он никуда не денется и в большинстве случаев лучше
+    бы Вам принять его сторону. Безусловно, это
+    достаточно трудоемкий процесс, но рано или
+    поздно, Вам придется перейти на HTTP/2.
+    Когда Вы с этим покончите, вы получите
+    <a href="https://www.youtube.com/watch?v=RWLzUnESylc&t=1s&list=PLNYkxOF6rcIBTs2KPy1E6tIYaWoFcG3uj&index=25" target="_blank"> отличный прирост в производительности </a>с
+    сервис воркерами и сервер пушами.
+</p>
+<p>
+    <img src="img/http2.png" alt="индикатор безопасности">
+</p>
+<p>
+    В итоге, Google собирается помечать все HTTP
+    страницы как небезопасные и поменять индикатор
+    безопасности на этих страницах на красный треугольник,
+    такой же как сейчас у сломанных HTTPS.
+    Отрицательный эффект такая миграция на HTTPS,
+    может возыметь в случае если Ваша база пользователей
+    HTTP/1.1 очень велика, и большая часть из них
+    использует устаревшие браузеры и операционные системы.
+    В этом случае Вам придется отправлять разные сборки
+    приложения, который должны будут адаптироваться под
+    <a href="https://rmurphey.com/blog/2015/11/25/building-for-http2" target="_blank">  разные процессы взаимодействия</a>.
+    Помните: Установка как миграции так и новой сборки
+    могут быть достаточно сложными и время затратными.
+    Для последующих частей статьи, предположим, что
+    Вы ли уже переключились на HTTP/2 или уже занимаетесь
+    этим вопросом.
 
 </p>
 <h3>
@@ -434,18 +556,19 @@
     25. Используется ли сжатие Brotli или Zopfli?
 </h3>
 <p>
-    В прошлом году Google представили миру Brotli, новый формат данных без потерь,
-    который уже широко поддерживается в Chrome, Firefox и Opera. На практике, Brotli
-    представляется более эффективным чем Gzip и Deflate. Сам процесс
+    В прошлом году Google <a href="https://opensource.googleblog.com/2015/09/introducing-brotli-new-compression.html" target="
+">представили миру Brotli</a>, новый формат данных без потерь,
+    который уже <a href="http://caniuse.com/#search=brotli" target="_blank">широко поддерживается </a>в Chrome, Firefox и Opera. На практике, Brotli
+    представляется <a href="https://samsaffron.com/archive/2016/06/15/the-current-state-of-brotli-compression" target="_blank">более эффективным</a> чем Gzip и Deflate. Сам процесс
     сжатия может быть затяжным, в зависимости от настроек и чем дольше длится сжатие,
     тем выше будет уровень самого сжатия. Кстати говоря, декомпрессия происходит быстро.
     Не будет сюрпризом что браузеры будут поддерживать этот алгоритм только если пользователь
     посещает вебсайт через HTTPS, ведь алгоритм разработан в Google, но на самом деле, на то
     есть еще и технические причины. Загвоздка в том, что Brotli не предустановлен на большинстве
     серверов сегодня, и не так уж просто его настроить без самостоятельной компиляции NGINX или
-    Ubuntu. Однако, вы можете активировать Brotli даже на тех CDN, которые пока что его не
+    Ubuntu. Однако, вы можете <a href="http://calendar.perfplanet.com/2016/enabling-brotli-even-on-cdns-that-dont-support-it-yet/" target="_blank">активировать Brotli </a> даже на тех CDN, которые пока что его не
     поддерживают (enable Brotli even on CDNs that don’t support it) yet (с помощью сервис воркеров).
-    В качестве альтернативы, можете рассмотреть алгоритм сжатия Zopfli
+    В качестве альтернативы, можете рассмотреть <a href="https://blog.codinghorror.com/zopfli-optimization-literally-free-bandwidth/" target="_blank"> алгоритм сжатия Zopfli</a>
     (Zopfli’s compression algorithm), который кодирует информацию в форматы Deflate,
     Gzip и Zlib. Любой ресурс сжатый простым Gzip-ом можно выгодно сжимать с Zopfli’s
     с улучшеным кодированием Deflate, потому что файлы будут на 3-8% меньше чем может
@@ -459,24 +582,73 @@
     26. Активировано ли OCSP сшивание?
 </h3>
 <p>
+    <a href="https://www.digicert.com/enabling-ocsp-stapling.htm" target="_blank">Включая сшивание OCSP </a>на своем сервере,
+    Вы сможете значительно ускорить «рукопожатия» протокола
+    TLS. Протокол OCSP (Online Certificate Status Protocol)
+    был создан в качестве альтернативы для протокола CRL
+    (Certificate Revocation List). Оба протокола используются
+    для проверки валидности SSL сертификата. Однако, протокол
+    OCSP не требует чтобы браузер тратил время, загружая
+    список сертификатов и детальную информацию про них для
+    поиска, таким образом уменьшая время затраченное на
+    «рукопожатие».
 </p>
 <h3>
     27. Успели ли Вы взять IPv6 на вооружение?
 </h3>
 <p>
-
+    Поскольку запасы адресов IPv4 <a href="https://en.wikipedia.org/wiki/IPv4_address_exhaustion" target="_blank">подходят к концу</a>,
+    большинство мобильных сетей получают поддержку
+    IPv6 просто молниеносно
+    (США достигли порога в 50% поддержки IPv6),
+    будет замечательной идеей обновить поддержку Вашего
+    DNS на IPv6  что бы
+    в будущем обеспечить себе спокойный сон.
+    Просто убедитесь что во всей сети предоставляется
+    двойной стэк – IPv4 и IPv6 — это позволит IPv6 и IPv4
+    работать одновременно бок о бок. В конце концов, IPv6
+    не обратно-совместимый. Также, исследования показали
+    что IPv6 сделала эти сайты на 10-15%
+    быстрее благодаря техника обнаружения соседа (NDP) и
+    оптимизации маршрута.
 </p>
 <h3>
     28. Пользуетесь ли Вы HPACK сжатием?
 </h3>
 <p>
-
+    В случае если вы используете HTTP/2, стоит убедиться,
+    что Ваши сервера <a href="https://blog.cloudflare.com/hpack-the-silent-killer-feature-of-http-2/" target="_blank">используют сжатие HPACK </a>в заголовках HTTP
+    ответов, чтобы уменьшить использование ресурсов.
+    Из-за того, что сервера HTTP/2 относительно молоды,
+    может иметь место неполноценная поддержка спецификаций,
+    с HPACK, например. <a href="https://github.com/summerwind/h2spec" target="_blank">H2spec </a>это отличный
+    (и очень детализированный) инструмент что бы проверить
+    <a href="https://www.keycdn.com/blog/http2-hpack-compression/" target="_blank">работоспособность HPACK</a>.
+</p>
+<p>
+    <img src="img/HPack%20spec.png" alt="H2speck">
+    <br>
+    <i>
+        H2spec
+    </i>
 </p>
 <h3>
     29. Работают ли сервис воркеры для кэширования и сетевых фолбэков?
 </h3>
 <p>
-
+    Как ни оптимизируй сетевую передачу данных, она не будет
+    быстрее чем получение данных из локального кэша, хранящегося
+    на устройстве пользователя. Если Ваш вебсайт использует HTTPS,
+    стоит присмотреться к <a href="https://github.com/lyzadanger/pragmatist-service-worker" target="_blank">«Прагматичному гиду по сервис воркерам»</a>
+     что бы добавлять в кэш сервис воркеров статические
+    материалы и локально хранить офлайн фолбэки
+    (или целые офлайн страницы) и открывать их из памяти
+    устройства пользователя а не отправляться за ними в.
+    Будет полезным также посмотреть <a href="https://jakearchibald.com/2014/offline-cookbook/" target="_blank">«Книгу рецептов для Офлайна»</a>
+    от Джейка и бесплатный Udacity курс
+    <a href="https://www.udacity.com/course/offline-web-applications--ud899" target="_blank">“Offline Web Applications.”</a> Волнуетесь о поддержке браузерами?
+    Не стоит, <a href="http://caniuse.com/#search=serviceworker" target="_blank">она на подходе</a>, да и сеть в любом
+    случае останется запасным вариантом.
 </p>
 
 
